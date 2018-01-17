@@ -1,0 +1,62 @@
+---
+title: "Lego"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+#Has lego used more colors over time
+Combine inventory_parts and colors datasets
+```{r}
+names(colors)[1]<-"color_id"
+inventory_parts_colors<-inventory_parts%>%
+  merge(colors, by = "color_id")
+```
+Select year and id from sets
+```{r}
+set_year<-sets%>%
+  select(set_num, year)
+```
+Select iventory id and set_num from inventory
+```{r}
+inventory_set<-inventories%>%
+  select(id, set_num)
+
+names(inventory_set)[1]<-"inventory_id"
+```
+Merge inventory_set and set_uyear
+```{r}
+inventory_set_year<-inventory_set%>%
+  merge(set_year, by= "set_num")%>%
+  select(inventory_id, year)
+```
+Combine color and year
+```{r}
+color_year<-inventory_parts_colors%>%
+  merge(inventory_set_year, by = "inventory_id")%>%
+  select(inventory_id, name, year)
+```
+Number of Colors per year
+```{r}
+color_year_final<-color_year%>%
+  group_by(year)%>%
+  mutate(color_number = n_distinct(name))
+
+color_selected<-color_year_final%>%
+  select(year, color_number)
+
+color_final<-unique(color_selected)
+```
+Graph Colors Over Years
+```{r}
+ggplot(data = color_final, aes(year, color_number))+geom_col(fill = "darkblue")
+```
+Summary Stats
+```{r}
+summary(color_final$color_number)
+```
+
+
+
