@@ -57,6 +57,11 @@ Summary Stats
 ```{r}
 summary(color_final$color_number)
 ```
+The Year with The Most Colors
+```{r}
+color_final%>%
+  filter(color_number == 99.0)
+```
 
 
 
