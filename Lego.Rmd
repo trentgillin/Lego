@@ -86,7 +86,7 @@ color_theme_final<-color_theme_final%>%
 ```
 Graph Number of Themes Per Color
 ```{r}
-ggplot(data = color_theme_final, aes(theme, color_number))+geom_col(color = "darkblue")+theme(text = element_text(size=8),axis.text.x = element_text(angle=90, vjust=2))
+ggplot(data = color_theme_final, aes(theme, color_number))+geom_col(color = "darkblue")+theme(text = element_text(size=8),axis.text.x = element_text(angle=90, vjust=2))ggtitle("The Top 103 Themes With The Most Color")+theme(plot.title = element_text(hjust = 0.5))
 ```
 Find out What Theme Has the Max Amount of Colors
 ```{r}
