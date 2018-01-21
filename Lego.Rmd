@@ -51,7 +51,8 @@ color_final<-unique(color_selected)
 ```
 Graph Colors Over Years
 ```{r}
-ggplot(data = color_final, aes(year, color_number))+geom_col(fill = "darkblue")
+legoplot<-ggplot(data = color_final, aes(year, color_number))+geom_col(fill = "darkblue")
+legoplot+ggtitle("The Number of Colors Used By Lego From 1950-2018")+theme(plot.title = element_text(hjust = 0.5))
 ```
 Summary Stats
 ```{r}
@@ -61,6 +62,36 @@ The Year with The Most Colors
 ```{r}
 color_final%>%
   filter(color_number == 99.0)
+```
+Let's Look at The Number of Colors Per Theme 
+```{r}
+names(themes)[1]<-"theme_id"
+sets_themes<-sets%>%
+  merge(themes, by = "theme_id", all.x = TRUE)
+theme_color<-sets_themes%>%
+  merge(inventory_set, by = "set_num", all.x = TRUE)%>%
+  merge(inventory_parts, by = "inventory_id", all.x = TRUE)%>%
+  merge(colors, by = "color_id", all.x = TRUE)%>%
+  select(c("year", "name.y", "name"))
+  names(theme_color)[1:3]<-c("year", "theme", "color")
+  
+color_theme_final<-theme_color%>%
+  group_by(theme)%>%
+  mutate(color_number = n_distinct(color))
+
+color_theme_final<-color_theme_final%>%
+  select(c("theme", "color_number"))%>%
+  unique()%>%
+  filter(color_number>36)
+```
+Graph Number of Themes Per Color
+```{r}
+ggplot(data = color_theme_final, aes(theme, color_number))+geom_col(color = "darkblue")+theme(text = element_text(size=8),axis.text.x = element_text(angle=90, vjust=2))
+```
+Find out What Theme Has the Max Amount of Colors
+```{r}
+max(color_theme_final$color_number)
+color_theme_final%>%group_by(color_number)%>%filter(color_number == 78)
 ```
 
 
