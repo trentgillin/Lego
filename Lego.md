@@ -1,55 +1,52 @@
----
-title: "Lego"
-output: github_document
----
+Lego
+================
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-library(tidyverse)
-library(readr)
-colors <- read_csv("data/colors.csv")
-inventories <- read_csv("data/inventories.csv")
-inventory_parts <- read_csv("data/inventory_parts.csv")
-inventory_sets <- read_csv("data/inventory_sets.csv")
-part_categories <- read_csv("data/part_categories.csv")
-part_relationships <- read_csv("data/part_relationships.csv")
-parts <- read_csv("data/parts.csv")
-sets <- read_csv("data/sets.csv")
-themes <- read_csv("data/themes.csv")
-```
-#Legos Use of Color Over Time
-Combine inventory_parts and colors datasets
-```{r}
+Legos Use of Color Over Time
+============================
+
+Combine inventory\_parts and colors datasets
+
+``` r
 names(colors)[1]="color_id"
 inventory_parts_colors<-inventory_parts%>%
   merge(colors, by = "color_id")
 ```
+
 Select year and id from sets
-```{r}
+
+``` r
 set_year<-sets%>%
   select(set_num, year)
 ```
-Select iventory id and set_num from inventory
-```{r}
+
+Select iventory id and set\_num from inventory
+
+``` r
 inventory_set<-inventories%>%
   select(id, set_num)
 
 names(inventory_set)[1]<-"inventory_id"
 ```
-Merge inventory_set and set_uyear
-```{r}
+
+Merge inventory\_set and set\_uyear
+
+``` r
 inventory_set_year<-inventory_set%>%
   merge(set_year, by= "set_num")%>%
   select(inventory_id, year)
 ```
+
 Combine color and year
-```{r}
+
+``` r
 color_year<-inventory_parts_colors%>%
   merge(inventory_set_year, by = "inventory_id")%>%
   select(inventory_id, name, year)
 ```
+
 Number of Colors per year
-```{r}
+
+``` r
 color_year_final<-color_year%>%
   group_by(year)%>%
   mutate(color_number = n_distinct(name))
@@ -59,22 +56,40 @@ color_selected<-color_year_final%>%
 
 color_final<-unique(color_selected)
 ```
+
 Graph Colors Over Years
-```{r}
+
+``` r
 legoplot<-ggplot(data = color_final, aes(year, color_number))+geom_col(fill = "darkblue")
 legoplot+ggtitle("The Number of Colors Used By Lego From 1950-2018")+theme(plot.title = element_text(hjust = 0.5))
 ```
-Summary Stats
-```{r}
+
+![](Lego_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-7-1.png) Summary Stats
+
+``` r
 summary(color_final$color_number)
 ```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##    5.00   10.00   19.00   31.67   56.00   99.00
+
 The Year with The Most Colors
-```{r}
+
+``` r
 color_final%>%
   filter(color_number == 99.0)
 ```
-#Number of Colors Per Theme
-```{r}
+
+    ## # A tibble: 1 x 2
+    ## # Groups:   year [1]
+    ##    year color_number
+    ##   <int>        <int>
+    ## 1  2005           99
+
+Number of Colors Per Theme
+==========================
+
+``` r
 names(themes)[1]<-"theme_id"
 sets_themes<-sets%>%
   merge(themes, by = "theme_id", all.x = TRUE)
@@ -94,15 +109,30 @@ color_theme_final<-color_theme_final%>%
   unique()%>%
   filter(color_number>36)
 ```
+
 Graph of Number of Colors Per Theme
-```{r}
+
+``` r
 ggplot(data = color_theme_final, aes(theme, color_number))+geom_col(color = "darkblue")+theme(text = element_text(size=8), axis.text.x = element_text(angle=90, vjust=2))+ggtitle("The Top 103 Themes With The Most Color")+theme(plot.title = element_text(hjust = 0.5))
 ```
-Find out What Theme Has the Max Amount of Colors
-```{r}
+
+![](Lego_files/figure-markdown_github-ascii_identifiers/unnamed-chunk-11-1.png) Find out What Theme Has the Max Amount of Colors
+
+``` r
 max(color_theme_final$color_number)
+```
+
+    ## [1] 78
+
+``` r
 color_theme_final%>%group_by(color_number)%>%filter(color_number == 78)
 ```
+
+    ## # A tibble: 2 x 2
+    ## # Groups:   color_number [1]
+    ##        theme color_number
+    ##        <chr>        <int>
+    ## 1 Fairy-Tale           78
+    ## 2  Basic Set           78
+
 It appears Fairly-Tale and Basic Set have the most colors used.
-
-
